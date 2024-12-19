@@ -19,8 +19,8 @@ The Rockbuster Stealth Management Board has asked a series of business questions
 ## Data
 The Rockbuster dataset includes various business information regarding inventory, customer profiles, and payment transactions.
 ### Data Details
-Inventory: includes films and their release year, rating, actors, category, and language.
-Customer Profile: includes names, emails, and physical addresses.
+Inventory: includes films and their release year, rating, actors, category, and language.  
+Customer Profile: includes names, emails, and physical addresses.  
 Payment Transactions: includes rental price, rental duration, and replacement cost.
 ## Visualizations
 View the interactive [Rockbuster Presentation](https://public.tableau.com/app/profile/jordan.boer/viz/RockbusterPresentationbyJordanBoer/Story1) on Tableau Public.
