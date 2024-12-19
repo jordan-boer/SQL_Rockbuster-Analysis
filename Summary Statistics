@@ -1,4 +1,4 @@
--- Summary statistics for numerical values of film information --
+-- SQL query calculating summary statistics for numerical values of film info --
 SELECT 
   COUNT(*) AS total_films, 
   AVG(release_year) AS avg_release_year, 
@@ -17,3 +17,12 @@ SELECT
   MIN(replacement_cost) AS min_replacement_cost, 
   MAX(replacement_cost) AS max_replacement_cost 
 FROM film;
+
+-- SQL query calculating summary statistics for non-numerical values of customer info --
+SELECT
+  MODE() WITHIN GROUP (ORDER BY first_name) AS modal_first_name,
+  MODE() WITHIN GROUP (ORDER BY last_name) AS modal_last_name,
+  MODE() WITHIN GROUP (ORDER BY email) AS modal_email,
+  MODE() WITHIN GROUP (ORDER BY activebool) AS modal_activebool,
+  MODE() WITHIN GROUP (ORDER BY create_date) AS modal_create_date,
+FROM customer;
