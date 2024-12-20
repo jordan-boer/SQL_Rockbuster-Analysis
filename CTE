@@ -1,0 +1,64 @@
+-- Rewriting subqery of average amount paid by top 5 customers as CTE --
+WITH total_paid_cte (customer_id, first_name, last_name, city, country, amount) AS 
+( 
+    SELECT A.customer_id, 
+          B.first_name, 
+          B.last_name, 
+          D.city, 
+          E.country, 
+          SUM(A.amount) 
+    FROM payment A 
+    INNER JOIN customer B ON A.customer_id = B.customer_id 
+    INNER JOIN address C ON B.address_id = C.address_id 
+    INNER JOIN city D ON C.city_id = D.city_id 
+    INNER JOIN country E ON D.country_id = E.country_id 
+    WHERE country IN ('India', 'China', 'United States', 
+                      'Japan', 'Mexico', 'Brazil', 
+                      'Russian Federation', 'Philippines', 
+                      'Turkey', 'Indonesia') 
+    AND city IN ('Aurora', 'Pingxiang', 'Sivas', 'Dhule (Dhulia)', 
+                'Kurashiki', 'Xintai', 'Adoni', 'Celaya', 
+                'Nezahualcoytl', 'Atlixto') 
+    GROUP BY A.customer_id, B.first_name, B.last_name, D.city, E.country 
+    ORDER BY SUM(A.amount) DESC 
+    LIMIT 5 
+) 
+SELECT AVG(amount) AS average 
+FROM total_paid_cte;
+
+
+-- Rewriting subquery of what countries top 5 customers are based in as CTE --
+WITH top_5_customers_cte (customer_id, first_name, last_name, city, country, amount) AS 
+( 
+    SELECT A.customer_id, 
+          B.first_name, 
+          B.last_name, 
+          D.city, 
+          E.country, 
+          SUM(A.amount) 
+    FROM payment A 
+    INNER JOIN customer B ON A.customer_id = B.customer_id 
+    INNER JOIN address C ON B.address_id = C.address_id 
+    INNER JOIN city D ON C.city_id = D.city_id 
+    INNER JOIN country E ON D.country_id = E.country_id 
+    WHERE country IN ('India', 'China', 'United States', 
+                      'Japan', 'Mexico', 'Brazil', 
+                      'Russian Federation', 'Philippines', 
+                      'Turkey', 'Indonesia') 
+    AND city IN ('Aurora', 'Pingxiang', 'Sivas', 'Dhule (Dhulia)', 
+                'Kurashiki', 'Xintai', 'Adoni', 'Celaya', 
+                'Nezahualcoyotl', 'Atlixto') 
+    GROUP BY A.customer_id, B.first_name, B.last_name, D.city, E.country 
+    ORDER BY SUM(A.amount) DESC 
+    LIMIT 5 
+) 
+SELECT E.country, 
+      COUNT(DISTINCT B.customer_id) AS all_customer_count, 
+      COUNT(DISTINCT top_5_customers_cte.customer_id) AS top_customer_count 
+FROM customer B 
+INNER JOIN address C ON B.address_id = C.address_id 
+INNER JOIN city D ON C.city_id = D.city_id 
+INNER JOIN country E ON D.country_id = E.country_id 
+LEFT JOIN top_5_customers_cte ON B.customer_id = top_5_customers_cte.customer_id 
+GROUP BY E.country 
+ORDER BY top_customer_count DESC;
