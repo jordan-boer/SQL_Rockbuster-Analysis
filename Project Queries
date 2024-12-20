@@ -1,0 +1,71 @@
+-- Company metrics -- 
+SELECT 
+    SUM(p.amount) AS total_revenue, 
+    COUNT(DISTINCT film_id) AS total_movies, 
+    COUNT(DISTINCT country_id) AS total_countries 
+FROM payment p 
+INNER JOIN rental r ON p.rental_id = r.rental_id 
+INNER JOIN inventory i ON r.inventory_id = i.inventory_id 
+INNER JOIN customer c ON p.customer_id = c.customer_id 
+INNER JOIN address a ON c.address_id = a.address_id 
+INNER JOIN city ci ON a.city_id = ci.city_id;
+
+
+--customer metrics-- 
+SELECT 
+    COUNT(DISTINCT A.customer_id) AS total_customers, 
+    MAX(A.return_date - A.rental_date) AS max_rental_duration, 
+    AVG(A.return_date - A.rental_date) AS avg_rental_duration, 
+    MIN(A.return_date - A.rental_date) AS min_rental_duration, 
+    MAX(C.rental_rate) AS max_rental_rate, 
+    AVG(C.rental_rate) AS avg_rental_rate, 
+    MIN(C.rental_rate) AS min_rental_rate 
+FROM rental A 
+INNER JOIN inventory B ON A.inventory_id = B.inventory_id 
+INNER JOIN film C ON B.film_id = C.film_id 
+WHERE return_date IS NOT NULL;
+
+
+-- movie and genre revenue -- 
+SELECT 
+    f.title AS movie_title, 
+    ca.name AS genre, 
+    SUM(p.amount) AS total_revenue 
+FROM payment p 
+INNER JOIN rental r ON p.rental_id = r.rental_id 
+INNER JOIN inventory i ON r.inventory_id = i.inventory_id 
+INNER JOIN film f ON i.film_id = f.film_id 
+INNER JOIN film_category fc ON f.film_id = fc.film_id 
+INNER JOIN category ca ON fc.category_id = ca.category_id 
+GROUP BY f.title, ca.name 
+ORDER BY f.title;
+
+
+--total customers and revenue by country-- 
+SELECT co.country AS country, 
+      SUM(p.amount) AS total_revenue, 
+      COUNT(DISTINCT p.customer_id) AS total_customers 
+FROM payment p 
+INNER JOIN customer cu ON p.customer_id = cu.customer_id 
+INNER JOIN address a ON cu.address_id = a.address_id 
+INNER JOIN city ci ON a.city_id = ci.city_id 
+INNER JOIN country co ON ci.country_id = co.country_id 
+GROUP BY co.country 
+ORDER BY co.country;
+
+
+--high value customers-- 
+SELECT cu.first_name AS first_name, 
+      cu.last_name AS last_name, 
+      ci.city AS city, 
+      co.country AS country, 
+      SUM(p.amount) AS total_paid, 
+      COUNT(r.rental_id) AS total_rentals 
+FROM payment p 
+INNER JOIN rental r ON p.rental_id = r.rental_id 
+INNER JOIN customer cu ON r.customer_id = cu.customer_id 
+INNER JOIN address a ON cu.address_id = a.address_id 
+INNER JOIN city ci ON a.city_id = ci.city_id 
+INNER JOIN country co ON ci.country_id = co.country_id 
+GROUP BY cu.first_name, cu.last_name, ci.city, co.country 
+ORDER BY SUM(p.amount) DESC, COUNT(r.rental_id);
